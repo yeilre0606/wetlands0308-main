@@ -1,0 +1,146 @@
+/* 基本重置樣式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 整體樣式 */
+body {
+    font-family: 'Arial', sans-serif; /* 可根據需要替換字體 */
+    line-height: 1.6;
+    color: #333; /* 基本文字顏色 */
+    font-size: 25px;
+}
+
+/* 全屏背景和導航欄 */
+.hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 確保 header 佔滿整個視窗高度 */
+    background-image:url('https://www.dbnsa.gov.tw/att/pic/b_11007084.jpg'); /* 背景圖片路徑 */
+    background-size: cover;
+    background-position: center;
+    color: #fff; /* 文字顏色 */
+    text-align: center; /* 文字居中 */
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px; /* 頂部和底部間距 */
+}
+
+.navbar ul {
+    display: flex;
+    list-style: none;
+}
+
+.navbar li {
+    margin: 0 15px; /* 左右間距 */
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white; /* 導航連結顏色 */
+}
+
+/* 主內容區域 */
+.hero-content {
+    margin-top: 50px; /* 導航欄與內容間距 */
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ff6600; /* 按鈕顏色 */
+    color: white; /* 按鈕文字顏色 */
+    border-radius: 5px; /* 按鈕圓角 */
+    margin-top: 20px; /* 按鈕與內容間距 */
+}
+
+/* 介紹區塊 */
+.intro-section {
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    align-items: center; /* 垂直置中 */
+    flex-direction: column; /* 讓文字與圖片縱向排列 */
+    text-align: center; /* 確保文字也居中 */
+    background-color: #f4f4f4; /* 介紹區域背景顏色 */
+}
+
+.intro-section img {
+    width: 100%;
+    max-width: 600px; /* 限制圖片最大寬度 */
+    height: auto; /* 自動調整高度以保持比例 */
+    margin-top: 20px;
+}
+
+/* 實時觀察區 */
+.live-observation {
+    padding: 50px 20px;
+    background-color: #e0e0e0; /* 實時觀察區背景顏色 */
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin-top: 20px;
+}
+
+.live-observation iframe {
+    width: 100%;
+    max-width: 800px;
+    height: 500px;
+    border: none;
+}
+
+/* 頁腳 */
+footer {
+    background-color: #333; /* 頁腳背景顏色 */
+    color: white; /* 頁腳文字顏色 */
+    text-align: center;
+    padding: 20px 0; /* 上下內邊距 */
+}
+
+footer p {
+    margin: 0; /* 去掉頁腳文字的邊距 */
+}
+
+/* 媒體查詢 */
+@media (max-width: 768px) {
+    /* 平板及小屏幕 */
+    .navbar {
+        flex-direction: column; /* 導航欄垂直排列 */
+        align-items: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem; /* 調整主標題大小 */
+    }
+
+    .cta-button {
+        font-size: 0.9rem; /* 調整按鈕文字大小 */
+    }
+}
+
+@media (max-width: 480px) {
+    /* 手機 */
+    .hero-content h1 {
+        font-size: 1.5rem; /* 調整主標題大小 */
+    }
+
+    .live-observation iframe {
+        height: 300px; /* 在手機上縮小 iframe 高度 */
+    }
+}
+
+.live-feed {
+    margin: auto;
+    width: 50%;
+    border: 0solid ;
+    padding: 10px;
+    text-align: center;
+  }
+

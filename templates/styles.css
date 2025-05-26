@@ -1,0 +1,141 @@
+
+/* 全局樣式 */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    color: black;
+}
+
+/* 全屏背景與導航欄 */
+.hero {
+    height: 100vh;
+    background-image: url('https://www.dbnsa.gov.tw/att/pic/b_11007084.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    color: black;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* 主題句和按鈕 */
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* 介紹區塊 */
+.intro-section {
+    padding: 50px;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+.intro-section img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin-top: 20px;
+}
+
+/* 實時觀察區 */
+.live-observation {
+    padding: 50px;
+    text-align: center;
+    background-color: #e0f7fa;
+}
+
+.live-feed iframe {
+    width: 80%;
+    height: 400px;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+/* 社群分享區 */
+.community-section {
+    padding: 50px;
+    background-color: #d1c4e9;
+    text-align: center;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.photo-grid img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* 頁腳 */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-links a {
+    color: black;
+    font-size: 1.2rem;
+}
+/* 將連結文字設置為黑色 */
+a {
+    color: black;
+    text-decoration: none; /* 移除下劃線 */
+}
+
+a:hover {
+    color: #555; /* 當滑鼠懸停時，改為深灰色 */
+}

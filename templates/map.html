@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鳥松濕地標記地圖</title>
+    <style>
+        /* 设置地图的高度 */
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head> 
+<body>
+    <h1>鳥松濕地標記地圖</h1>
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            // 创建地图对象，中心点设在鸟松湿地
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 18, // 设置缩放级别为固定的初始大小
+                center: {lat: 22.65225, lng: 120.35079}, // 设置地图中心点
+                disableDefaultUI: true, // 禁用默认UI控制
+                scrollwheel: false, // 禁止鼠标滚轮缩放
+                draggable: false // 禁用拖动地图
+            });
+    
+            // 使用 Jinja2 渲染 locations 数据
+            var locations = {{ locations|tojson }};
+            const image = {
+                url: "/static/無標題104.png",
+                scaledSize: new google.maps.Size(50, 50) // 缩放标记图标的大小
+            };
+    
+            // 创建一个信息窗口对象
+            var infoWindow = new google.maps.InfoWindow();
+
+            // 添加其他位置
+            var specialLocations = [
+                {lat: 22.65273052437465, lng: 120.34976471008196, title: "大門入口", content: "這是大門入口，歡迎來到鳥松濕地!", icon: "/static/白頭翁地標.png"},
+                {lat: 22.652464276945704, lng: 120.34978914682766, title: "自然中心", content: "這是自然中心，提供有關濕地的資訊。", icon: "/static/夜鷺地標.png"},
+                {lat: 22.652268804219435, lng: 120.35028363531853, title: "賞鳥平台", content: "這是賞鳥平台，可以觀察各種鳥類。", icon: "/static/紅冠水雞地標.png"},
+                {lat: 22.652109847243736, lng: 120.35041122338853, title: "賞鳥屋", content: "這是賞鳥屋，提供舒適的觀鳥環境。", icon: "/static/家燕地標.png"},
+                {lat: 22.65323388811864, lng: 120.35022484086107, title: "解說平台", content: "這是解說平台，可以了解濕地的生態與歷史。", icon: "/static/綠繡眼地標.png"}
+            ];
+    
+            // 添加所有位置標記
+            locations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: {lat: location.緯度, lng: location.經度},
+                    map: map,
+                    title: location.title || '', // 使用 title 如果存在
+                    icon: image
+                });
+
+                // 當標記被點擊時，顯示對應的內容
+                marker.addListener('click', function() {
+                    infoWindow.setContent(location.title || '曾經出現的生物座標');
+                    infoWindow.open(map, marker);
+                });
+            });
+    
+            // 添加特殊位置標記
+            specialLocations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: {lat: location.lat, lng: location.lng},
+                    map: map,
+                    title: location.title,
+                    icon: {
+                        url: location.icon,
+                        scaledSize: new google.maps.Size(50, 50) // 設置每個特殊標記的大小
+                    }
+                });
+
+                // 當滑鼠移動到標記上時顯示內容
+                marker.addListener('mouseover', function() {
+                    infoWindow.setContent(location.content); // 顯示對應的內容
+                    infoWindow.open(map, marker);
+                });
+
+                // 當滑鼠移開標記時，關閉內容窗口
+                marker.addListener('mouseout', function() {
+                    infoWindow.close();
+                });
+            });
+        }
+    </script>
+    
+    <!-- 加载 Google Maps JavaScript API -->
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWh_1NcyW2XgxfI2dlANYWKD_NyDvqC4&callback=initMap&libraries=places&v=weekly">
+    </script>
+</body>
+</html>

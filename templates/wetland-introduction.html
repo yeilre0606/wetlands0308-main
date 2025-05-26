@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不一樣的溼地觀賞</title>
+    <style>
+        /* 基本樣式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            background-color: rgb(44,86,72);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgb(82,135,14);
+        }
+
+        .navbar ul {
+            display: flex;
+            gap: 50px;
+            list-style: none;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .navbar ul li {
+            display: flex;
+        }
+
+        .navbar ul li img {
+            max-width: 100%;
+            max-height: 100px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar ul li img:hover {
+            transform: scale(1.2);
+        }
+
+        main {
+            font-size: 30px;
+            background-color: rgb(44,86,72);
+            padding-top: 100px;
+            flex-grow: 1; /* 讓 main 部分佔據剩餘空間 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px; /* 為了讓底部有些空間 */
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: aliceblue;
+        }
+
+        footer {
+            background-color: rgb(203,196,54);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+            width: 100%;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .navbar ul li img {
+                max-height: 70px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .map-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar ul li img {
+                max-height: 50px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* 各區段的內容 */
+        .intro-section, .details-section {
+            background-color: rgb(44,86,72);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 80%;
+            text-align: center;
+        }
+
+        .intro-section img,
+        .details-section img {
+            max-width: 80%;  /* 設定最大寬度為 80% */
+            height: auto;    /* 高度自動調整，保持比例 */
+            margin-top: 20px;
+        }
+
+        .details-section ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .details-section ul li {
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo"><img src="/static/網頁圖/網頁標題.png" alt="網站標題"></div>
+            <ul>
+                <li><a href="/"><img src="/static/網頁圖/back(3).jpg" alt="返回"></a></li>
+                <li><a href="/f"><img src="/static/網頁圖/introduce(2).jpg" alt="介紹"></a></li>
+                <li><a href="/a"><img src="/static/網頁圖/biodiversity(2).jpg" alt="生物多樣性"></a></li>
+                <li><a href="/b"><img src="/static/網頁圖/about Us(2).jpg" alt="關於我們"></a></li>
+            </ul>
+        </nav>
+        <div class="hero-content">
+            <h1>濕地介紹</h1>
+        </div>
+    </header>
+
+    <main>
+        <section class="intro-section">
+            <h2>什麼是濕地？</h2>
+            <p>濕地是指水體和陸地之間的過渡區域，常年水分充足，並且能支持特定的動植物群體。它們在生態系統中起著重要作用，保護生物多樣性和調節水資源。</p>
+            <img src="static/123.jpg" alt="濕地景觀">
+        </section>
+
+        <section class="details-section">
+            <h2>濕地的重要性</h2>
+            <ul>
+                <li>保護生物多樣性</li>
+                <li>調節水循環</li>
+                <li>提供栖息地</li>
+                <li>防止洪水與侵蝕</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 濕地觀察 | AI Automated Lab</p>
+    </footer>
+
+    <script>
+        const links = document.querySelectorAll('.navbar a');
+        const content = document.getElementById('content');
+
+        links.forEach(link => {
+            links.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.getAttribute('href').substring(1);
+            });
+        });
+
+        function switchToScene(sceneId) {
+        const url = `index.html?sceneId=${sceneId}`; // 拼接場景 ID 的參數
+        window.location.href = url; // 跳轉到全景頁面
+    }
+    </script> 
+</body>
+</html>

@@ -1,0 +1,56 @@
+/* 全體頁面背景設置 */
+body {
+    background-color: #333;  /* 深灰色背景 */
+    color: white;            /* 文字顏色設為白色，與背景對比 */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;  /* 讓頁面充滿視窗 */
+}
+
+/* 內容區域 */
+.content {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.7);  /* 半透明黑色背景 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* 標題樣式 */
+h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+/* 攝影機容器 */
+.camera-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* 畫布層 */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* 視訊元素 */
+video {
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* 固定的鳥松Logo */
+#logo {
+    position: absolute;
+    bottom: 20px;  /* 置於攝像頭畫面左下角，距離底部20px */
+    left: 20px;    /* 置於攝像頭畫面左邊，距離左側20px */
+    width: 100px;  /* 調整Logo的寬度，依需求調整 */
+    height: auto;
+}

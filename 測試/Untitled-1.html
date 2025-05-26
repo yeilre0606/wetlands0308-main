@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端 JavaScript 範例</title>
+</head>
+<body>
+    <nav>
+        <a href="#page1" class="nav-link">Page 1</a>
+        <a href="#page2" class="nav-link">Page 2</a>
+    </nav>
+    <main id="content">
+        <h1>歡迎來到首頁</h1>
+    </main>
+
+    <footer>© 2024 範例網站</footer>
+
+    <script>
+        // JavaScript 直接寫在前端
+        const links = document.querySelectorAll('.nav-link');
+        const content = document.getElementById('content');
+
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // 阻止默認行為
+                const page = e.target.getAttribute('href').substring(1); // 取得鏈接的目標
+
+                // 模擬頁面內容切換
+                if (page === 'page1') {
+                    content.innerHTML = '<h1>這是第一頁</h1>';
+                } else if (page === 'page2') {
+                    content.innerHTML = '<h1>這是第二頁</h1>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

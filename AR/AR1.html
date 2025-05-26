@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/face-api.min.js"></script>
+    <title>鳥松濕地特效</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="content">
+        <h1>鳥松濕地特效</h1>
+        <div class="camera-container">
+            <video id="video" autoplay width="640" height="480" style="border: 2px solid rgb(252, 250, 250);"></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <button onclick="window.location.href='/'"><img id="logo" src="/AR/images/logo.jpg" alt="鳥松Logo"></button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化模型與圖像
+        let hat, leaf1, leaf2;
+
+        // 啟動攝影機
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById("video").srcObject = stream;
+                console.log("✅ 攝影機已開啟");
+            } catch (err) {
+                console.error("❌ 無法開啟攝影機", err);
+            }
+        }
+
+        // 載入模型與圖片資源
+        async function loadModels() {
+            console.log("⌛ 開始載入模型...");
+            await faceapi.nets.tinyFaceDetector.loadFromUri("/AR/models");
+            console.log("✅ 模型載入完成！");
+
+            hat = new Image();
+            hat.src = 'images/bird-hat.png';  // 帽子圖片
+            hat.onload = () => console.log("帽子圖片載入成功");
+            hat.onerror = () => console.error("帽子圖片載入失敗");
+
+            leaf1 = new Image();
+            leaf1.src = 'images/leaf.png';  // 第一張葉子圖片
+            leaf1.onload = () => console.log("葉子 1 圖片載入成功");
+            leaf1.onerror = () => console.error("葉子 1 圖片載入失敗");
+
+            leaf2 = new Image();
+            leaf2.src = 'images/leaf2.png';  // 第二張葉子圖片
+            leaf2.onload = () => console.log("葉子 2 圖片載入成功");
+            leaf2.onerror = () => console.error("葉子 2 圖片載入失敗");
+
+            // 確保所有圖片載入完成後才開始人臉偵測
+            await Promise.all([
+                new Promise((resolve) => { hat.onload = resolve; }),
+                new Promise((resolve) => { leaf1.onload = resolve; }),
+                new Promise((resolve) => { leaf2.onload = resolve; })
+            ]);
+            console.log("所有圖片已載入完成");
+        }
+
+        // 人臉偵測與特效繪製
+        async function detectFaces() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            // 設定畫布尺寸
+            const displaySize = { width: video.width, height: video.height };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            // 鳥的動畫參數
+            let birdOffset = 0; // 鳥的偏移量
+            let birdDirection = 5; // 鳥的移動方向（1: 向右，-1: 向左）
+            const birdSpeed = 2; // 鳥的移動速度（小幅度）
+            const birdAmplitude = 10; // 鳥的移動範圍（小幅度）
+
+            // 葉子的動畫參數
+            let leaf1Y = 0; // 葉子 1 的初始 y 坐標
+            let leaf2Y = 0; // 葉子 2 的初始 y 坐標
+            const leafSpeed = 10; // 葉子下墜速度
+            const leafRotationSpeed = 0.02; // 葉子旋轉速度
+
+            console.log("⌛ 開始人臉偵測...");
+            setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+                // 清除畫布，重新繪製偵測結果
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 繪製攝影機畫面
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // 繪製帽子與葉子（原有邏輯）
+                resizedDetections.forEach(det => {
+                    const { x, y, width, height } = det.box;
+
+                    // 帽子的位置，依照人臉坐標調整
+                    const hatWidth = width;
+                    const hatHeight = hat.height * (hatWidth / hat.width);
+                    const hatX = x;
+                    const hatY = y - hatHeight * 0.5; // 固定帽子位置
+
+                    // 鳥的動畫（在帽子位置進行小幅度的反覆左右游泳）
+                    birdOffset += birdDirection * birdSpeed;
+                    if (birdOffset > birdAmplitude || birdOffset < -birdAmplitude) {
+                        birdDirection *= -1;
+                    }
+                    const birdX = hatX + birdOffset; // 鳥的 x 坐標
+                    const birdY = hatY - 20; // 鳥的 y 坐標（稍微高於帽子）
+                    ctx.drawImage(hat, birdX, birdY, hatWidth, hatHeight);
+
+                    // 葉子的位置，依照人臉坐標調整
+                    const leaf1Width = width * 0.5;
+                    const leaf1Height = leaf1.height * (leaf1Width / leaf1.width);
+                    const leaf1X = x - (width * 0.2);
+                    leaf1Y += leafSpeed;
+                    if (leaf1Y > canvas.height) leaf1Y = -leaf1Height; // 葉子下墜後重新從頂部開始
+                    ctx.save();
+                    ctx.translate(leaf1X, leaf1Y + leaf1Height / 2);
+                    ctx.rotate(Date.now() * leafRotationSpeed);
+                    ctx.drawImage(leaf1, -leaf1Width / 2, -leaf1Height / 2, leaf1Width, leaf1Height);
+                    ctx.restore();
+
+                    const leaf2Width = width * 0.5;
+                    const leaf2Height = leaf2.height * (leaf2Width / leaf2.width);
+                    const leaf2X = x + width - (width * 0.2);
+                    leaf2Y += leafSpeed;
+                    if (leaf2Y > canvas.height) leaf2Y = -leaf2Height; // 葉子下墜後重新從頂部開始
+                    ctx.save();
+                    ctx.translate(leaf2X, leaf2Y + leaf2Height / 2);
+                    ctx.rotate(Date.now() * leafRotationSpeed);
+                    ctx.drawImage(leaf2, -leaf2Width / 2, -leaf2Height / 2, leaf2Width, leaf2Height);
+                    ctx.restore();
+                });
+            }, 500);
+        }
+
+        // 主程序
+        async function main() {
+            await startCamera();
+            await loadModels();
+            await detectFaces();
+        }
+
+        // 確保 face-api.js 先載入
+        window.onload = () => {
+            if (typeof faceapi === "undefined") {
+                console.error("❌ face-api.js 載入失敗！");
+            } else {
+                console.log("✅ face-api.js 載入成功");
+                main();
+            }
+        };
+    </script>
+</body>
+</html>

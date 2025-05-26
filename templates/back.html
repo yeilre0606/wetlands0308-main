@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不一樣的溼地觀賞</title>
+    <style>
+        /* 基本樣式 */
+        body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+            }
+
+            header {
+                height: 100vh;
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                background-color: rgb(44,86,72);
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+                background-color: rgb(82,135,14);
+            }
+
+            .navbar ul {
+                display: flex;
+                gap: 50px;
+                list-style: none;
+                padding: 10px;
+                margin: 0;
+            }
+
+            .navbar ul li {
+                display: flex;
+            }
+
+            .navbar ul li img {
+                max-width: 100%;
+                max-height: 100px;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .navbar ul li img:hover {
+                transform: scale(1.2);
+            }
+
+            main{
+                background-color: rgb(44,86,72);
+                position: relative;
+                padding-top: 100px;
+                padding-bottom: 50px; /* 增加底部填充 */
+                min-height: 100vh;
+            }
+
+            .hero-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                margin-top: 60px;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                position: fixed; /* 固定標題 */
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 10;
+                padding: 10px 0;
+                font-size: 3rem;
+                text-align: center;
+                color: aliceblue;
+            }
+
+            .hero-content p {
+                color: aliceblue;
+                font-size: 30px;
+                margin-top: 120px; /* 根據 h1 的高度進行調整 */
+            }
+
+            .hero-content video {
+                max-width: 100%;
+                height: auto;
+                margin-top: 20px;
+            }
+
+            .map-container{
+                margin-bottom: 50px;
+            }
+
+            .map-h2{
+                font-size: 3rem;
+                color: aliceblue;
+                text-align: center; /* 文字水平置中 */
+                margin: 20px 0; /* 上下邊距，視情況調整 */
+            }
+
+            footer {
+                background-color: rgb(203,196,54);
+                color: white;
+                text-align: center;
+                padding: 20px 0;
+                position: relative;
+                width: 100%;
+                margin:0;
+            }
+
+        /* 圖片按鈕樣式 */
+        #image-button {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none; /* 初始隱藏 */
+            z-index: 1000;
+        }
+
+        #image-button img {
+            width: 100px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .navbar ul li img {
+                max-height: 70px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar ul li img {
+                max-height: 50px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* 直向式手機螢幕調整 */
+        @media (orientation: portrait) and (max-width: 768px) {
+            header {
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .navbar ul li img {
+                max-height: 40px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+
+            #map {
+                width: 90%;
+                height: 300px;
+            }
+
+            #image-button {
+                right: 10px;
+                top: 60%;
+            }
+
+            #image-button img {
+                width: 80px;
+            }
+
+            body {
+                overflow-x: hidden;
+            }
+
+            .hero-content {
+                white-space: normal;
+            }
+        }
+
+        /* 設置地圖容器 */
+        #map {
+            height: 600px;
+            width: 60%;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo"><img src="/static/網頁圖/網頁標題.png"></div>
+            <ul>
+                <ul>
+                    <li><a href="/"><img src="/static/網頁圖/back(3).jpg" alt="返回"></a></li>
+                    <li><a href="/f"><img src="/static/網頁圖/introduce(2).jpg" alt="介紹"></a></li>
+                    <li><a href="/a"><img src="/static/網頁圖/biodiversity(2).jpg" alt="生物多樣性"></a></li>
+                    <li><a href="/b"><img src="/static/網頁圖/about Us(2).jpg" alt="關於我們"></a></li>
+                </ul>
+            </ul>
+        </nav>
+        <div class="hero-content">
+            <h1>探索自然的靜謐</h1>
+            <p>感受濕地的生命力，與大自然的每一刻同行。</p>
+            <video width="600" autoplay loop muted>
+                <source src="https://youtu.be/3obeNUhAqnk" type="video/mp4">
+            </video>
+        </div>
+    </header>
+    <main>
+        <!-- 地圖區域 -->
+        <section id="map-container">
+            <h2 class="map-h2">探索濕地地圖</h2>
+            <div id="map"></div>
+        </section>
+    </main>
+
+    <!-- 圖片按鈕 -->
+    <button id="image-button" onclick="window.location.href = '/AR/AR1.html'">
+        <img src="/static/網頁圖/相機.png" alt="圖片按鈕">
+    </button>
+
+    <footer>
+        <p>© 2024 濕地觀察 | AI Automated Lab</p>
+    </footer>
+
+    <script>
+        let userMarker;  // 用戶位置標記
+        let watchId;     // 用於存儲追蹤ID
+        let map;         // 地圖實例
+        const targetLat = 22.648781; // 目標緯度
+        const targetLng = 120.350165; // 目標經度
+        const radius = 0.1; // 範圍半徑（單位：公里）
+
+        // 獲取用戶的 GPS 位置
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("您的瀏覽器不支持Geolocation API。");
+                initMap(22.65273052437465, 120.34976471008196); // 如果瀏覽器不支持，顯示默認位置
+            }
+        }
+
+        // 顯示用戶位置
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log(`緯度: ${latitude}, 經度: ${longitude}`);
+
+            // 將經緯度傳遞給Google Maps API來顯示位置
+            initMap(latitude, longitude);
+
+            // 檢查是否在目標範圍內
+            checkIfInRange(latitude, longitude);
+        }
+
+        // 檢查是否在目標範圍內
+        function checkIfInRange(lat, lng) {
+            const distanceToTarget1 = getDistanceFromLatLonInKm(lat, lng, 22.648781, 120.350165);
+            const distanceToTarget2 = getDistanceFromLatLonInKm(lat, lng, 22.65273052437465, 120.34976471008196);
+
+            const imageButton = document.getElementById('image-button');
+
+            if (distanceToTarget1 <= radius) {
+                imageButton.style.display = 'block'; // 顯示圖片按鈕
+                imageButton.setAttribute('onclick', "window.location.href = '/AR/AR2.html'"); // 設置為 AR2
+            } else if (distanceToTarget2 <= radius) {
+                imageButton.style.display = 'block'; // 顯示圖片按鈕
+                imageButton.setAttribute('onclick', "window.location.href = '/AR/AR1.html'"); // 設置為 AR1
+            } else {
+                imageButton.style.display = 'none'; // 隱藏圖片按鈕
+            }
+        }
+
+        // 計算兩個經緯度之間的距離（Haversine公式）
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // 地球半徑（公里）
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // 距離（公里）
+            return distance;
+        }
+
+        // 將度數轉換為弧度
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // 處理錯誤
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("用戶拒絕了位置請求。");
+                    initMap(22.65273052437465, 120.34976471008196); // 顯示默認位置
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("位置信息不可用。");
+                    break;
+                case error.TIMEOUT:
+                    alert("獲取位置超時。");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("發生未知錯誤。");
+                    break;
+            }
+        }
+
+        // 初始化 Google 地圖
+        function initMap(latitude, longitude) {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 18, // 設置縮放級別
+                center: {lat: latitude, lng: longitude}, // 地圖中心
+                disableDefaultUI: true, // 禁用默認UI控制
+                scrollwheel: true, // 允許使用滾輪縮放
+                draggable: true, // 允許拖動地圖
+                mapTypeId: google.maps.MapTypeId.SATELLITE, // 設置衛星地圖
+                zoomControl: true, // 開啟縮放控制
+                streetViewControl: false, // 關閉街景視圖
+            });
+
+            // 設定移動範圍（限制範圍為某個區域）
+            /*var bounds = {
+                north: 22.654, // 北界
+                south: 22.651, // 南界
+                east: 120.352, // 東界
+                west: 120.348 // 西界
+            };
+
+            // 限制地圖只能移動在這個範圍內
+            map.setOptions({
+                restriction: {
+                    latLngBounds: bounds,
+                    strictBounds: false // 設為 false 以允許地圖稍微超出範圍
+                }
+            });*/
+
+            // 定義特殊位置標記
+            const specialLocations = [
+                {lat: 22.65273052437465, lng: 120.34976471008196, title: "大門入口", content: "這是大門入口，歡迎來到鳥松濕地!", icon: "/static/白頭翁地標.png", url: "index.js"},
+                {lat: 22.652464276945704, lng: 120.34978914682766, title: "自然中心", content: "這是自然中心，提供有關濕地的資訊。", icon: "/static/夜鷺地標.png", url: "index1.js"},
+                {lat: 22.652268804219435, lng: 120.35028363531853, title: "賞鳥平台", content: "這是賞鳥平台，可以觀察各種鳥類。", icon: "/static/紅冠水雞地標.png", url: "index2.js"},
+                {lat: 22.652109847243736, lng: 120.35041122338853, title: "賞鳥屋", content: "這是賞鳥屋，提供舒適的觀鳥環境。", icon: "/static/家燕地標.png", url: "index3.js"},
+                {lat: 22.65323388811864, lng: 120.35022484086107, title: "解說平台", content: "這是解說平台，可以了解濕地的生態與歷史。", icon: "/static/綠繡眼地標.png", url: "index4.js"},
+                {lat:22.648229277474123, lng:120.35015135445721, title: "正修科大",content:"圖科大樓",icon:"/static/網頁圖/CSU MIS實驗室 地標.png"}
+            ];
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            // 添加每個特殊位置標記
+            specialLocations.forEach(function(location) {
+                var marker = new google.maps.Marker({
+                    position: {lat: location.lat, lng: location.lng},
+                    map: map,
+                    title: location.title,
+                    icon: {
+                        url: location.icon,
+                        scaledSize: new google.maps.Size(50, 50) // 可以調整圖標大小
+                    }
+                });
+
+                // 當滑鼠移動到標記上時顯示內容
+                marker.addListener('mouseover', function() {
+                    infoWindow.setContent(location.content);
+                    infoWindow.open(map, marker);
+                });
+
+                // 當滑鼠移開時，關閉顯示內容
+                marker.addListener('mouseout', function() {
+                    infoWindow.close();
+                });
+
+                // 假设 location.url 是一个有效的 JS 文件路径
+                var location = {
+                    url: '/path/to/index3.js' // 示例路径
+                };
+
+                marker.addListener('click', function() {
+                    // 检查 location.url 是否存在
+                    if (!location.url) {
+                        console.error('location.url is not defined');
+                        return;
+                    }
+
+                    // 构造新的 URL
+                    var sceneUrl = `/app-files/index.html?sceneJs=${encodeURIComponent(location.url)}`;
+
+                    // 跳转到新页面
+                    window.location.href = sceneUrl;
+                });
+            });
+
+            // 添加用戶位置的標記
+            userMarker = new google.maps.Marker({
+                position: {lat: latitude, lng: longitude},
+                map: map,
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, // 使用內建箭頭符號
+                    fillColor: "#00FF00", // 填充顏色
+                    fillOpacity: 1, // 填充透明度
+                    strokeColor: "#000000", // 邊框顏色
+                    strokeWeight: 1, // 邊框寬度
+                    scale: 5, // 圖標大小
+                    rotation: 0 // 初始旋轉角度
+                }
+            });
+
+            // 啟動實時追蹤
+            startRealTimeTracking();
+
+            // 監聽設備朝向變化
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener("deviceorientation", handleOrientation, true);
+            } else {
+                console.log("您的設備不支持設備朝向事件。");
+            }
+        }
+
+        // 實時位置追蹤
+        function startRealTimeTracking() {
+            const options = {
+                enableHighAccuracy: true,   // 高精度模式
+                maximumAge: 30000,         // 位置快取最大年齡(ms)
+                timeout: 27000             // 取得位置的超時時間
+            };
+
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    position => {
+                        updateUserPosition(position);
+                        checkIfInRange(position.coords.latitude, position.coords.longitude); // 檢查是否在範圍內
+                    },
+                    handleTrackingError,
+                    options
+                );
+            }
+        }
+
+        // 更新用戶位置
+        function updateUserPosition(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // 更新用戶標記位置
+            if (userMarker) {
+                const newPos = new google.maps.LatLng(lat, lng);
+                userMarker.setPosition(newPos);
+                map.panTo(newPos); // 自動平移地圖中心
+            }
+        }
+
+        // 處理設備朝向事件
+        function handleOrientation(event) {
+            if (event.alpha !== null && userMarker) {
+                const heading = event.alpha; // 獲取設備的朝向（0 到 360 度）
+                userMarker.setIcon({
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    fillColor: "#00FF00",
+                    fillOpacity: 1,
+                    strokeColor: "#000000",
+                    strokeWeight: 1,
+                    scale: 5,
+                    rotation: heading // 設置箭頭的旋轉角度
+                });
+            }
+        }
+
+        // 錯誤處理
+        function handleTrackingError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("用戶拒絕了位置請求。");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("位置信息不可用。");
+                    break;
+                case error.TIMEOUT:
+                    alert("獲取位置超時。");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("發生未知錯誤。");
+                    break;
+            }
+        }
+
+        // 在頁面加載時獲取位置
+        window.onload = getLocation;
+
+        // 頁面卸載時清理
+        window.onbeforeunload = () => {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+        };
+    </script>
+
+    <!-- 載入 Google Maps API -->
+    <script async 
+            defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWh_1NcyW2XgxfI2dlANYWKD_NyDvqC4&callback=initMap&libraries=places&v=beta">
+        </script>
+
+    <script>
+        const links = document.querySelectorAll('.navbar a');
+        const content = document.getElementById('content');
+
+        links.forEach(link => {
+            links.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.getAttribute('href').substring(1);
+            });
+        });
+    </script> 
+</body>
+</html>

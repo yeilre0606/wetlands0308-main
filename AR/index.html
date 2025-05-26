@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/face-api.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <title>鳥松濕地特效</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        #logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>鳥松濕地特效</h1>
+        <div class="camera-container">
+            <video id="video" autoplay width="640" height="480" style="border: 2px solid rgb(252, 250, 250);"></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <button onclick="window.location.href='https://65a8-39-1-4-182.ngrok-free.app'"><img id="logo" src="images/logo.jpg" alt="鳥松Logo"></button>
+        </div>
+    </div>
+
+    <script>
+        let hat, leaf1, leaf2, effectImage;
+        let hands;
+        let isEffectVisible = false; // 控制特效顯示狀態
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById("video").srcObject = stream;
+                console.log("✅ 攝影機已開啟");
+            } catch (err) {
+                console.error("❌ 無法開啟攝影機", err);
+                alert("無法開啟攝影機，請確保已授予攝影機權限。");
+            }
+        }
+
+        async function loadModels() {
+            console.log("⌛ 開始載入模型...");
+            await faceapi.nets.tinyFaceDetector.loadFromUri("/AR/models");
+            console.log("✅ 模型載入完成！");
+
+            hat = new Image();
+            hat.src = 'images/bird-hat.png';
+
+            leaf1 = new Image();
+            leaf1.src = 'images/leaf.png';
+
+            leaf2 = new Image();
+            leaf2.src = 'images/leaf2.png';
+
+            // 初始化 effectImage
+            effectImage = new Image();
+            effectImage.src = 'AR/images/effect.png'; // 確保路徑正確
+            effectImage.onload = () => {
+                console.log("✅ 特效圖片已載入");
+            };
+            effectImage.onerror = () => {
+                console.error("❌ 特效圖片載入失敗");
+            };
+
+            hat.onload = () => {
+                leaf1.onload = () => {
+                    leaf2.onload = () => {
+                        console.log("所有圖片已載入完成");
+                        main();
+                    };
+                };
+            };
+        }
+
+        async function initializeHands() {
+            hands = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            hands.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5,
+                selfieMode: true, // 如果需要自拍模式
+                logger: { // 關閉日誌輸出
+                    log: () => {},
+                    warn: () => {},
+                    error: () => {}
+                }
+            });
+
+            hands.onResults(onHandResults);
+            console.log("✅ 手勢偵測已初始化");
+        }
+
+        function onHandResults(results) {
+            if (results.multiHandLandmarks) {
+                let isHandOpen = false;
+                for (const landmarks of results.multiHandLandmarks) {
+                    if (isHandOpenCheck(landmarks)) {
+                        isHandOpen = true;
+                        break;
+                    }
+                }
+                console.log("手掌狀態：", isHandOpen ? "張開" : "握拳");
+                isEffectVisible = isHandOpen;
+            } else {
+                isEffectVisible = false;
+            }
+        }
+
+        function isHandOpenCheck(landmarks) {
+            // 關鍵點索引（MediaPipe Hands 的 21 個關鍵點）
+            const THUMB_TIP = 4;         // 拇指尖
+            const INDEX_FINGER_TIP = 8;  // 食指尖
+            const MIDDLE_FINGER_TIP = 12; // 中指尖
+            const RING_FINGER_TIP = 16;  // 無名指尖
+            const PINKY_TIP = 20;        // 小指尖
+
+            // 計算手掌張開的程度
+            const thumbToIndex = distance(landmarks[THUMB_TIP], landmarks[INDEX_FINGER_TIP]);
+            const indexToMiddle = distance(landmarks[INDEX_FINGER_TIP], landmarks[MIDDLE_FINGER_TIP]);
+            const middleToRing = distance(landmarks[MIDDLE_FINGER_TIP], landmarks[RING_FINGER_TIP]);
+            const ringToPinky = distance(landmarks[RING_FINGER_TIP], landmarks[PINKY_TIP]);
+
+            // 如果手指之間的距離較大，表示手掌張開
+            const threshold = 0.1; // 調整此閾值以適應不同手勢
+            return (
+                thumbToIndex > threshold &&
+                indexToMiddle > threshold &&
+                middleToRing > threshold &&
+                ringToPinky > threshold
+            );
+        }
+
+        function distance(point1, point2) {
+            // 計算兩個關鍵點之間的距離
+            return Math.sqrt(
+                Math.pow(point1.x - point2.x, 2) +
+                Math.pow(point1.y - point2.y, 2)
+            );
+        }
+
+        async function detectFaces() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            const detectAndDraw = async () => {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                detections.forEach(det => {
+                    const { x, y, width, height } = det.box;
+
+                    const hatWidth = width;
+                    const hatHeight = hat.height * (hatWidth / hat.width);
+                    const hatX = x;
+                    const hatY = y - hatHeight * 0.3;
+                    ctx.drawImage(hat, hatX, hatY, hatWidth, hatHeight);
+
+                    const leaf1X = x - 50;
+                    let leaf1Y = y - 100;
+                    if (leaf1Y < 0) leaf1Y = 0;
+                    ctx.drawImage(leaf1, leaf1X, leaf1Y);
+
+                    const leaf2X = x + width - 50;
+                    let leaf2Y = y - 150;
+                    if (leaf2Y < 0) leaf2Y = 0;
+                    ctx.drawImage(leaf2, leaf2X, leaf2Y);
+                });
+
+                // 根據 isEffectVisible 顯示或隱藏特效
+                if (isEffectVisible) {
+                    console.log("顯示特效");
+                    ctx.drawImage(effectImage, canvas.width / 2 - 50, canvas.height / 2 - 50, 100, 100);
+                }
+
+                requestAnimationFrame(detectAndDraw);
+            };
+
+            detectAndDraw();
+        }
+
+        async function main() {
+            await startCamera();
+            await loadModels();
+            await initializeHands();
+            await detectFaces();
+
+            const video = document.getElementById("video");
+            const camera = new Camera(video, {
+                onFrame: async () => {
+                    await hands.send({ image: video });
+                },
+                width: 640,
+                height: 480
+            });
+            camera.start();
+        }
+
+        window.onload = () => {
+            if (typeof faceapi === "undefined") {
+                console.error("❌ face-api.js 載入失敗！");
+            } else {
+                console.log("✅ face-api.js 載入成功");
+                main();
+            }
+        };
+
+        window.addEventListener("beforeunload", () => {
+            const video = document.getElementById("video");
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>

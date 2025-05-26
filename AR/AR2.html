@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/face-api.min.js"></script>
+    <title>鳥松濕地特效</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="content">
+        <h1>鳥松濕地特效</h1>
+        <div class="camera-container">
+            <video id="video" autoplay width="640" height="480" style="border: 2px solid rgb(252, 250, 250);"></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <button onclick="window.location.href='/'"><img id="logo" src="/AR/images/CSU MIS實驗室logo-1-1.png" alt="鳥松Logo"></button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化模型與圖像
+        let hat, leaf1, leaf2;
+
+        // 判斷是否為直向顯示
+        function isPortraitMode() {
+            return window.innerHeight > window.innerWidth;
+        }
+
+        // 調整 video 和 canvas 的尺寸
+        function adjustVideoAndCanvasSize() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+
+            if (isPortraitMode()) {
+                // 直向顯示時，調整為適合手機的尺寸
+                video.width = window.innerWidth * 0.9;
+                video.height = window.innerHeight * 0.7;
+            } else {
+                // 橫向顯示時，使用固定尺寸
+                video.width = 640;
+                video.height = 480;
+            }
+            canvas.width = video.width;
+            canvas.height = video.height;
+        }
+
+        // 啟動攝影機
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById("video").srcObject = stream;
+                console.log("✅ 攝影機已開啟");
+            } catch (err) {
+                console.error("❌ 無法開啟攝影機", err);
+            }
+        }
+
+        // 載入模型與圖片資源
+        async function loadModels() {
+            console.log("⌛ 開始載入模型...");
+            await faceapi.nets.tinyFaceDetector.loadFromUri("/AR/models");
+            console.log("✅ 模型載入完成！");
+
+            hat = new Image();
+            hat.src = 'images/CSU MIS實驗室logo-1.png';  // 帽子圖片
+
+            leaf1 = new Image();
+            leaf1.src = 'images/leaf.png';  // 第一張葉子圖片
+
+            leaf2 = new Image();
+            leaf2.src = 'images/leaf2.png';  // 第二張葉子圖片
+
+            // 確保所有圖片載入完成後才開始人臉偵測
+            hat.onload = () => {
+                leaf1.onload = () => {
+                    leaf2.onload = () => {
+                        console.log("所有圖片已載入完成");
+                        main(); // 當所有圖片載入完成後，開始主程序
+                    };
+                };
+            };
+        }
+
+        // 人臉偵測與特效繪製
+        async function detectFaces() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            // 設定畫布尺寸
+            const displaySize = { width: video.width, height: video.height };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            console.log("⌛ 開始人臉偵測...");
+            setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+                // 清除畫布，重新繪製偵測結果
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                resizedDetections.forEach(det => {
+                    const { x, y, width, height } = det.box;
+
+                    // 帽子的位置，依照人臉坐標調整
+                    const hatWidth = width;
+                    const hatHeight = hat.height * (hatWidth / hat.width);
+                    const hatX = x;
+                    const hatY = y - hatHeight * (isPortraitMode() ? 1.5 : 2); // 直向顯示時調整帽子位置
+                    ctx.drawImage(hat, hatX, hatY, hatWidth, hatHeight);
+
+                    // 葉子的位置，依照人臉坐標調整
+                    const leaf1Width = width * 0.5; // 葉子寬度為人臉寬度的 50%
+                    const leaf1Height = leaf1.height * (leaf1Width / leaf1.width);
+                    const leaf1X = x - (width * (isPortraitMode() ? 0.1 : 0.2));  // 直向顯示時調整葉子位置
+                    let leaf1Y = y - (height * (isPortraitMode() ? 0.3 : 0.5));
+                    if (leaf1Y < 0) leaf1Y = 0;
+                    ctx.drawImage(leaf1, leaf1X, leaf1Y, leaf1Width, leaf1Height);
+
+
+                    const leaf2Width = width * 0.5; // 葉子寬度為人臉寬度的 50%
+                    const leaf2Height = leaf2.height * (leaf2Width / leaf2.width);
+                    const leaf2X = x + width - (width * (isPortraitMode() ? 0.1 : 0.2));  // 直向顯示時調整葉子位置
+                    let leaf2Y = y - (height * (isPortraitMode() ? 0.4 : 0.6));
+                    if (leaf2Y < 0) leaf2Y = 0;
+                    ctx.drawImage(leaf2, leaf2X, leaf2Y, leaf2Width, leaf2Height);
+                        });
+            }, 500);
+        }
+
+        // 主程序
+        async function main() {
+            adjustVideoAndCanvasSize(); // 初始化時調整尺寸
+            await startCamera();
+            await loadModels();
+            await detectFaces();
+        }
+
+        // 監聽視窗大小變化（例如手機旋轉）
+        window.addEventListener("resize", () => {
+            adjustVideoAndCanvasSize();
+        });
+
+        // 確保 face-api.js 先載入
+        window.onload = () => {
+            if (typeof faceapi === "undefined") {
+                console.error("❌ face-api.js 載入失敗！");
+            } else {
+                console.log("✅ face-api.js 載入成功");
+                main();
+            }
+        };
+    </script>
+</body>
+</html>

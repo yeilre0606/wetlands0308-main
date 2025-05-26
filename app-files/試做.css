@@ -1,0 +1,112 @@
+/* 通用樣式 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0.8) 70%), url('https://www.example.com/galaxy-background.jpg') center/cover no-repeat;
+    color: #fff;
+    position: relative;
+    min-height: 100vh; /* 確保頁面至少滿足視口高度 */
+}
+
+/* 星空背景效果 */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.example.com/stars.png') repeat top left;
+    animation: starField 60s linear infinite; /* 星星移動的動畫 */
+    z-index: -1;
+}
+
+/* 頁首樣式 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #000; /* 頁首設置為黑色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.logo h1 {
+    font-size: 24px;
+    color: #fff;
+    margin: 0;
+}
+
+/* 導航欄樣式 */
+.nav-links {
+    display: flex;
+    gap: 20px; /* 控制項目之間的間距 */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.nav-links img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+/* 內容樣式 */
+.content {
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 50px; /* 確保內容不會被遮擋 */
+}
+
+/* 調整濕地影片展示區域 */
+#video-container,
+#preview-container {
+    margin: 20px auto;
+    max-width: 1000px; /* 控制區域寬度 */
+}
+
+#wetland-video,
+#preview-frame {
+    width: 100%;
+    height: 500px; /* 統一高度 */
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+/* 頁腳樣式 */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #000; /* 頁腳設置為黑色 */
+    color: #fff; /* 文字顏色為白色 */
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* 星星移動動畫效果 */
+@keyframes starField {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 20000px 20000px; /* 星星的移動範圍 */
+    }
+}
