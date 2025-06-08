@@ -63,11 +63,11 @@
             font-size: 30px;
             background-color: rgb(44,86,72);
             padding-top: 100px;
-            flex-grow: 1; /* 讓 main 部分佔據剩餘空間 */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 20px; /* 為了讓底部有些空間 */
+            padding-bottom: 20px;
         }
 
         .hero-content {
@@ -102,10 +102,6 @@
             .hero-content h1 {
                 font-size: 2.5rem;
             }
-
-            .map-container {
-                width: 100%;
-            }
         }
 
         @media (max-width: 480px) {
@@ -130,8 +126,8 @@
 
         .intro-section img,
         .details-section img {
-            max-width: 80%;  /* 設定最大寬度為 80% */
-            height: auto;    /* 高度自動調整，保持比例 */
+            max-width: 80%;
+            height: auto;
             margin-top: 20px;
         }
 
@@ -162,6 +158,8 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             z-index: 1000;
             transition: transform 0.3s ease;
+            color: white;
+            font-size: 24px;
         }
 
         .chatbot-toggle:hover {
@@ -312,7 +310,7 @@
 
     <!-- 聊天機器人浮動按鈕 -->
     <div id="chatbot-toggle" class="chatbot-toggle">
-        <img src="static/chatbot-icon.png" alt="濕地助手" width="50">
+        💬
     </div>
 
     <!-- 聊天機器人容器 -->
@@ -330,23 +328,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        const links = document.querySelectorAll('.navbar a');
-        const content = document.getElementById('content');
-
-        links.forEach(link => {
-            links.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = e.target.getAttribute('href').substring(1);
-            });
-        });
-
-        function switchToScene(sceneId) {
-            const url = `index.html?sceneId=${sceneId}`; // 拼接場景 ID 的參數
-            window.location.href = url; // 跳轉到全景頁面
-        }
-
-        // 聊天機器人功能
+        // 修正後的導航欄點擊事件處理
         document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.navbar a');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // 確保點擊的是連結本身，而不是其中的圖片
+                    if (e.target.tagName === 'IMG') {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        if (href) {
+                            console.log('導航至:', href);
+                            // 實際導航邏輯
+                            window.location.href = href;
+                        }
+                    }
+                });
+            });
+
+            // 場景切換功能
+            function switchToScene(sceneId) {
+                const url = `index.html?sceneId=${sceneId}`;
+                window.location.href = url;
+            }
+
+            // 聊天機器人功能
             const chatbotToggle = document.getElementById('chatbot-toggle');
             const chatbotContainer = document.getElementById('chatbot-container');
             const chatbotClose = document.getElementById('chatbot-close');
@@ -384,8 +391,7 @@
                     // 顯示"正在輸入"指示器
                     const typingIndicator = addBotMessage("濕地助手正在輸入...");
                     
-                    // 這裡應該替換為實際的API調用
-                    // 以下是模擬回應，實際使用時請取消註解下面的axios代碼
+                    // 模擬API回應
                     setTimeout(() => {
                         // 移除"正在輸入"指示器
                         chatMessages.removeChild(typingIndicator);
@@ -402,8 +408,8 @@
                         addBotMessage(randomResponse);
                     }, 1000);
                     
-                    /*
-                    // 實際調用Groq API的代碼（需要替換YOUR_GROQ_API_KEY）
+                    /* 
+                    // 實際API調用代碼（需要取消註解並添加API密鑰）
                     const response = await axios.post('https://api.groq.com/v1/chat/completions', {
                         model: "mixtral-8x7b-32768",
                         messages: [
@@ -420,20 +426,20 @@
                         max_tokens: 1024
                     }, {
                         headers: {
-                            'Authorization': 'Bearer ',
+                            'Authorization': 'Bearer YOUR_API_KEY_HERE',
                             'Content-Type': 'application/json'
                         }
                     });
-                    */
                     
-                    // 移除"正在輸入"指示器並添加實際回復
                     chatMessages.removeChild(typingIndicator);
                     const botReply = response.data.choices[0].message.content;
                     addBotMessage(botReply);
-                    
+                    */
                 } catch (error) {
-                    console.error('Error calling API:', error);
-                    chatMessages.removeChild(typingIndicator);
+                    console.error('Error:', error);
+                    if (typingIndicator && typingIndicator.parentNode) {
+                        chatMessages.removeChild(typingIndicator);
+                    }
                     addBotMessage("抱歉，暫時無法回答您的問題。請稍後再試。");
                 }
             }
