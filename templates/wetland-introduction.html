@@ -146,6 +146,130 @@
             margin-bottom: 10px;
         }
 
+        /* 聊天機器人樣式 */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: rgb(82,135,14);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background-color: rgb(44,86,72);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .chatbot-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .chatbot-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .chatbot-input button {
+            padding: 10px 15px;
+            background-color: rgb(82,135,14);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* 聊天消息樣式 */
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: rgb(203,196,54);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            background-color: #e5e5ea;
+            color: black;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 480px) {
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+                height: 60vh;
+                bottom: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -186,6 +310,25 @@
         <p>© 2024 濕地觀察 | AI Automated Lab</p>
     </footer>
 
+    <!-- 聊天機器人浮動按鈕 -->
+    <div id="chatbot-toggle" class="chatbot-toggle">
+        <img src="static/chatbot-icon.png" alt="濕地助手" width="50">
+    </div>
+
+    <!-- 聊天機器人容器 -->
+    <div id="chatbot-container" class="chatbot-container">
+        <div class="chatbot-header">
+            <h3>濕地知識助手</h3>
+            <button id="chatbot-close" class="chatbot-close">×</button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages"></div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-user-input" placeholder="詢問關於濕地的問題...">
+            <button id="chatbot-send">發送</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         const links = document.querySelectorAll('.navbar a');
         const content = document.getElementById('content');
@@ -198,9 +341,123 @@
         });
 
         function switchToScene(sceneId) {
-        const url = `index.html?sceneId=${sceneId}`; // 拼接場景 ID 的參數
-        window.location.href = url; // 跳轉到全景頁面
-    }
+            const url = `index.html?sceneId=${sceneId}`; // 拼接場景 ID 的參數
+            window.location.href = url; // 跳轉到全景頁面
+        }
+
+        // 聊天機器人功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotContainer = document.getElementById('chatbot-container');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotSend = document.getElementById('chatbot-send');
+            const userInput = document.getElementById('chatbot-user-input');
+            const chatMessages = document.getElementById('chatbot-messages');
+            
+            // 初始歡迎消息
+            addBotMessage("您好！我是濕地知識助手，可以回答您關於濕地生態、生物多樣性和保護的問題。請問您想了解什麼？");
+            
+            // 切換聊天機器人顯示
+            chatbotToggle.addEventListener('click', function() {
+                chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
+            });
+            
+            // 關閉聊天機器人
+            chatbotClose.addEventListener('click', function() {
+                chatbotContainer.style.display = 'none';
+            });
+            
+            // 發送消息
+            chatbotSend.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+                
+                addUserMessage(message);
+                userInput.value = '';
+                
+                try {
+                    // 顯示"正在輸入"指示器
+                    const typingIndicator = addBotMessage("濕地助手正在輸入...");
+                    
+                    // 這裡應該替換為實際的API調用
+                    // 以下是模擬回應，實際使用時請取消註解下面的axios代碼
+                    setTimeout(() => {
+                        // 移除"正在輸入"指示器
+                        chatMessages.removeChild(typingIndicator);
+                        
+                        // 模擬回應
+                        const responses = [
+                            "濕地是地球上最具生產力的生態系統之一，它們為許多物種提供了重要的棲息地。",
+                            "濕地可以自然過濾水質，去除污染物和過量營養物質。",
+                            "台灣的重要濕地包括關渡自然公園、高美濕地和七股濕地等。",
+                            "濕地被稱為"地球之腎"，因為它們能淨化水質，調節水循環。",
+                            "保護濕地有助於減緩氣候變遷，因為濕地能儲存大量碳。"
+                        ];
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        addBotMessage(randomResponse);
+                    }, 1000);
+                    
+                    
+                    // 實際調用Groq API的代碼（需要替換YOUR_GROQ_API_KEY）
+                    const response = await axios.post('https://api.groq.com/v1/chat/completions', {
+                        model: "mixtral-8x7b-32768",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "你是一個濕地生態專家，用中文回答關於濕地保護、生物多樣性和生態系統的問題。回答要專業但易懂，適合普通公眾閱讀。"
+                            },
+                            {
+                                role: "user",
+                                content: message
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1024
+                    }, {
+                        headers: {
+                            'Authorization': 'Bearer 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',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    // 移除"正在輸入"指示器並添加實際回復
+                    chatMessages.removeChild(typingIndicator);
+                    const botReply = response.data.choices[0].message.content;
+                    addBotMessage(botReply);
+                    
+                } catch (error) {
+                    console.error('Error calling API:', error);
+                    chatMessages.removeChild(typingIndicator);
+                    addBotMessage("抱歉，暫時無法回答您的問題。請稍後再試。");
+                }
+            }
+            
+            function addUserMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user-message';
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+            
+            function addBotMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+                return messageDiv;
+            }
+            
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
     </script> 
 </body>
 </html>
