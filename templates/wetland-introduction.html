@@ -395,14 +395,14 @@
                             "濕地是地球上最具生產力的生態系統之一，它們為許多物種提供了重要的棲息地。",
                             "濕地可以自然過濾水質，去除污染物和過量營養物質。",
                             "台灣的重要濕地包括關渡自然公園、高美濕地和七股濕地等。",
-                            "濕地被稱為"地球之腎"，因為它們能淨化水質，調節水循環。",
+                            "濕地被稱為地球之腎，因為它們能淨化水質，調節水循環。",
                             "保護濕地有助於減緩氣候變遷，因為濕地能儲存大量碳。"
                         ];
                         const randomResponse = responses[Math.floor(Math.random() * responses.length)];
                         addBotMessage(randomResponse);
                     }, 1000);
                     
-                    
+                    /*
                     // 實際調用Groq API的代碼（需要替換YOUR_GROQ_API_KEY）
                     const response = await axios.post('https://api.groq.com/v1/chat/completions', {
                         model: "mixtral-8x7b-32768",
@@ -420,10 +420,11 @@
                         max_tokens: 1024
                     }, {
                         headers: {
-                            'Authorization': 'Bearer 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',
+                            'Authorization': 'Bearer ',
                             'Content-Type': 'application/json'
                         }
                     });
+                    */
                     
                     // 移除"正在輸入"指示器並添加實際回復
                     chatMessages.removeChild(typingIndicator);
